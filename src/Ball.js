@@ -1,5 +1,5 @@
 import React, { Component, useEffect } from 'react';
-import { View, Animated } from 'react-native';
+import { View, Animated, Text } from 'react-native';
 
 const Ball = () => {
     const position = new Animated.ValueXY(0, 0);
