@@ -1,11 +1,12 @@
-import React, { Component, useRef } from 'react';
+import React, { Component, useRef, useState } from 'react';
 import { View, Animated, PanResponder, Dimensions } from 'react-native';
 
 const SCREEN_WIDTH = Dimensions.get('window').width;
 const SWIPE_THRESHOLD = 0.25 * SCREEN_WIDTH;
 const SWIPE_OUT_DURATION = 250;
 
-const Deck = ({data, renderCard, onSwipeLeft, onSwipeRight}) => {
+const Deck = ({data, renderCard, onSwipeLeft = () => {}, onSwipeRight = () => {}}) => {
+    const [index, setIndex] = useState(0);
     const position = useRef(new Animated.ValueXY()).current;
     const panResponder = React.useRef(
         PanResponder.create({
@@ -42,7 +43,10 @@ const Deck = ({data, renderCard, onSwipeLeft, onSwipeRight}) => {
     };
 
     const onSwipeComplete = (direction) => {
-        direction === 'right' ? onSwipeRight() : onSwipeLeft();
+        const item = data[index];
+        direction === 'right' ? onSwipeRight(item) : onSwipeLeft(item);
+        position.setValue({ x: 0, y: 0 });
+        setIndex(prev => prev + 1);
     };
 
     const getCardStyle = () => {
@@ -56,8 +60,12 @@ const Deck = ({data, renderCard, onSwipeLeft, onSwipeRight}) => {
         }; 
     };
 
-    const renderCards = () => data.map((item, index) => {
-            if (index === 0) {
+    const renderCards = () => data.map((item, i) => {
+            if (i < index) { 
+                return null; 
+            }
+
+            if (i === index) {
                 return (
                     <Animated.View
                         key={item.id}
