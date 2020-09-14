@@ -5,7 +5,7 @@ const SCREEN_WIDTH = Dimensions.get('window').width;
 const SWIPE_THRESHOLD = 0.25 * SCREEN_WIDTH;
 const SWIPE_OUT_DURATION = 250;
 
-const Deck = ({data, renderCard, onSwipeLeft = () => {}, onSwipeRight = () => {}}) => {
+const Deck = ({data, renderCard, renderNoMoreCards, onSwipeLeft = () => {}, onSwipeRight = () => {}}) => {
     const [index, setIndex] = useState(0);
     const position = useRef(new Animated.ValueXY()).current;
     const panResponder = React.useRef(
@@ -60,7 +60,12 @@ const Deck = ({data, renderCard, onSwipeLeft = () => {}, onSwipeRight = () => {}
         }; 
     };
 
-    const renderCards = () => data.map((item, i) => {
+    const renderCards = () => {
+        if (index >= data.length) {
+            return renderNoMoreCards();
+        }
+
+        return data.map((item, i) => {
             if (i < index) { 
                 return null; 
             }
@@ -78,7 +83,8 @@ const Deck = ({data, renderCard, onSwipeLeft = () => {}, onSwipeRight = () => {}
             }
             
             return renderCard(item);
-        });
+        })
+    };
 
     return (
         <View>
