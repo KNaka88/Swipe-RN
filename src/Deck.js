@@ -32,6 +32,10 @@ const Deck = ({data, renderCard, renderNoMoreCards, onSwipeLeft = () => {}, onSw
         })
     ).current;
 
+    useEffect(() => {
+        setIndex(0);
+    }, [data]);
+
     const resetPosition = () => {
         Animated.spring(position, {
             toValue: { x: 0, y: 0 },
