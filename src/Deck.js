@@ -49,14 +49,21 @@ const Deck = ({data, renderCard, renderNoMoreCards, onSwipeLeft = () => {}, onSw
         setIndex(prev => prev + 1);
     };
 
-    const getCardStyle = () => {
+    const getRotateStyle = () => {
         const rotate = position.x.interpolate({
             inputRange: [-SCREEN_WIDTH * 1.5, 0, SCREEN_WIDTH * 1.5],
             outputRange: ['-120deg', '0deg', '120deg']
         });
         return {
             ...position.getLayout(),
-            transform: [{ rotate }]
+            transform: [{ rotate }],
+        }; 
+    };
+
+    const getCardStyle = () => {
+        return {
+            position: 'absolute',
+            width: SCREEN_WIDTH
         }; 
     };
 
@@ -74,7 +81,7 @@ const Deck = ({data, renderCard, renderNoMoreCards, onSwipeLeft = () => {}, onSw
                 return (
                     <Animated.View
                         key={item.id}
-                        style={getCardStyle()}
+                        style={getRotateStyle()}
                         {...panResponder.panHandlers}   
                     >
                         {renderCard(item)}
@@ -82,8 +89,15 @@ const Deck = ({data, renderCard, renderNoMoreCards, onSwipeLeft = () => {}, onSw
                 );
             }
             
-            return renderCard(item);
-        })
+            return (
+                <Animated.View 
+                    key={item.id} 
+                    style={getCardStyle()}
+                >
+                  {renderCard(item)}
+                </Animated.View>
+            );
+        }).reverse();
     };
 
     return (
