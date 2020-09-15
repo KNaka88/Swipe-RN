@@ -1,9 +1,15 @@
-import React, { Component, useRef, useState } from 'react';
-import { View, Animated, PanResponder, Dimensions } from 'react-native';
+import React, { Component, useRef, useState, useEffect   } from 'react';
+import { View, Animated, PanResponder, Dimensions, LayoutAnimation, UIManager } from 'react-native';
 
 const SCREEN_WIDTH = Dimensions.get('window').width;
 const SWIPE_THRESHOLD = 0.25 * SCREEN_WIDTH;
 const SWIPE_OUT_DURATION = 250;
+
+if (Platform.OS === 'android') {
+    if (UIManager.setLayoutAnimationEnabledExperimental) {
+      UIManager.setLayoutAnimationEnabledExperimental(true);
+    }
+  }
 
 const Deck = ({data, renderCard, renderNoMoreCards, onSwipeLeft = () => {}, onSwipeRight = () => {}}) => {
     const [index, setIndex] = useState(0);
@@ -47,6 +53,13 @@ const Deck = ({data, renderCard, renderNoMoreCards, onSwipeLeft = () => {}, onSw
         direction === 'right' ? onSwipeRight(item) : onSwipeLeft(item);
         position.setValue({ x: 0, y: 0 });
         setIndex(prev => prev + 1);
+        LayoutAnimation.configureNext({
+            duration: 2000,
+            update: {
+              type: LayoutAnimation.Types.spring,
+              springDamping: 0.7,
+            },
+          });
     };
 
     const getRotateStyle = () => {
@@ -81,7 +94,7 @@ const Deck = ({data, renderCard, renderNoMoreCards, onSwipeLeft = () => {}, onSw
                 return (
                     <Animated.View
                         key={item.id}
-                        style={getRotateStyle()}
+                        style={[getRotateStyle(), getCardStyle()]}
                         {...panResponder.panHandlers}   
                     >
                         {renderCard(item)}
@@ -92,7 +105,7 @@ const Deck = ({data, renderCard, renderNoMoreCards, onSwipeLeft = () => {}, onSw
             return (
                 <Animated.View 
                     key={item.id} 
-                    style={getCardStyle()}
+                    style={[getCardStyle(), { top: 10 * (i - index) }]}
                 >
                   {renderCard(item)}
                 </Animated.View>
